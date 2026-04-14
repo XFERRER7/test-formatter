@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background -->
+  <rect width="32" height="32" rx="7" fill="#1f2937"/>
+  <!-- Clipboard body -->
+  <rect x="8" y="11" width="16" height="17" rx="2" fill="white"/>
+  <!-- Clipboard clip -->
+  <rect x="13" y="9" width="6" height="5" rx="1.5" fill="#1f2937"/>
+  <rect x="14.5" y="8" width="3" height="2.5" rx="1" fill="#6b7280"/>
+  <!-- Checkmark -->
+  <polyline points="11.5,18.5 14,21 20.5,14.5" fill="none" stroke="#1f2937" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -72,6 +72,39 @@ const CATEGORY_PLACEHOLDERS: Record<TestCategory, string> = {
     "Ex: Abrir a listagem e ver se o novo item aparece lá",
 };
 
+const FIXED_CHECKS: { title: string; description: string }[] = [
+  {
+    title: "Ortografia",
+    description:
+      "Existem erros de portugu\u00eas nos r\u00f3tulos, bot\u00f5es ou mensagens de alerta?",
+  },
+  {
+    title: "Campos Obrigat\u00f3rios",
+    description:
+      "Se eu deixar um campo obrigat\u00f3rio vazio e tentar salvar, o sistema barra ou d\u00e1 erro de c\u00f3digo (500)?",
+  },
+  {
+    title: "Tipagem de Campos",
+    description:
+      "Tentar inserir letras em campos de n\u00famero (ex: valor, telefone) ou s\u00edmbolos em campos de nome.",
+  },
+  {
+    title: "Limites de Caracteres",
+    description:
+      "Tentar colar um texto gigante em um campo pequeno para ver se o layout \"explode\" ou se o banco corta o texto.",
+  },
+  {
+    title: "Funcionamento ao redor",
+    description:
+      "A altera\u00e7\u00e3o afetou algo que j\u00e1 estava funcionando ao redor? Testar as funcionalidades relacionadas para garantir que n\u00e3o houve regress\u00e3o.",
+  },
+  {
+    title: "Responsividade",
+    description:
+      "Testar a interface em diferentes tamanhos de tela para garantir que os elementos se ajustem corretamente.",
+  },
+];
+
 const STORAGE_KEY = "test-formatter-scripts";
 
 function generateId() {
@@ -109,6 +142,12 @@ function formatScript(script: {
 
   lines.push("⚠️ Observações Técnicas:");
   lines.push(script.observations);
+  lines.push("");
+  lines.push("📌 Verificações Padrão (comuns a todas as tasks):");
+  for (const check of FIXED_CHECKS) {
+    lines.push(`[ ] ${check.title}: ${check.description}`);
+    lines.push("");
+  }
 
   return lines.join("\n");
 }
@@ -405,6 +444,30 @@ export default function Home() {
                   placeholder="Adicione observações técnicas relevantes..."
                   rows={4}
                 />
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-primary bg-secondary/60">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">📌</span>
+                  <CardTitle>Verificações padrão</CardTitle>
+                </div>
+                <CardDescription>
+                  Estas verificações são comuns a todas as tasks e já estarão no texto gerado.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  {FIXED_CHECKS.map((check) => (
+                    <li key={check.title} className="flex gap-2 text-sm">
+                      <span className="mt-0.5 shrink-0 text-muted-foreground">[ ]</span>
+                      <span>
+                        <span className="font-medium">{check.title}:</span>{" "}
+                        <span className="text-muted-foreground">{check.description}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </CardContent>
             </Card>
           </section>

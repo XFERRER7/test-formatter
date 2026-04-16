@@ -43,6 +43,8 @@ interface TestScript {
   name: string;
   functionality: string;
   environment: string;
+  link: string;
+  branch: string;
   tests: TestItem[];
   observations: string;
   createdAt: string;
@@ -122,6 +124,8 @@ function createInitialTests(): TestItem[] {
 function formatScript(script: {
   functionality: string;
   environment: string;
+  link: string;
+  branch: string;
   tests: TestItem[];
   observations: string;
 }): string {
@@ -129,6 +133,8 @@ function formatScript(script: {
   lines.push("🛠️ Roteiro de Teste");
   lines.push(`Funcionalidade: ${script.functionality}`);
   lines.push(`Ambiente: ${script.environment}`);
+  if (script.link) lines.push(`Link: ${script.link}`);
+  if (script.branch) lines.push(`Branch: ${script.branch}`);
   lines.push("");
   lines.push("📋 O que testar (Checklist):");
 
@@ -143,7 +149,7 @@ function formatScript(script: {
   lines.push("⚠️ Observações Técnicas:");
   lines.push(script.observations);
   lines.push("");
-  lines.push("📌 Verificações Padrão (comuns a todas as tasks):");
+  lines.push("📌 Verificações Padrão:");
   for (const check of FIXED_CHECKS) {
     lines.push(`[ ] ${check.title}: ${check.description}`);
     lines.push("");
@@ -169,6 +175,8 @@ function saveScripts(scripts: TestScript[]) {
 export default function Home() {
   const [functionality, setFunctionality] = useState("");
   const [environment, setEnvironment] = useState("");
+  const [link, setLink] = useState("");
+  const [branch, setBranch] = useState("");
   const [tests, setTests] = useState<TestItem[]>(createInitialTests());
   const [observations, setObservations] = useState("Sem observações");
   const [copied, setCopied] = useState(false);
@@ -181,8 +189,8 @@ export default function Home() {
   }, []);
 
   const formatted = useMemo(
-    () => formatScript({ functionality, environment, tests, observations }),
-    [functionality, environment, observations, tests]
+    () => formatScript({ functionality, environment, link, branch, tests, observations }),
+    [functionality, environment, link, branch, observations, tests]
   );
 
   const handleCopy = useCallback(async () => {
@@ -213,6 +221,8 @@ export default function Home() {
       name: functionality || "Roteiro sem nome",
       functionality,
       environment,
+      link,
+      branch,
       tests,
       observations,
       createdAt: new Date().toLocaleString("pt-BR"),
@@ -228,6 +238,8 @@ export default function Home() {
   const handleLoadScript = (script: TestScript) => {
     setFunctionality(script.functionality);
     setEnvironment(script.environment);
+    setLink(script.link ?? "");
+    setBranch(script.branch ?? "");
     setTests(script.tests);
     setObservations(script.observations);
     setShowSaved(false);
@@ -242,6 +254,8 @@ export default function Home() {
   const handleNew = () => {
     setFunctionality("");
     setEnvironment("");
+    setLink("");
+    setBranch("");
     setTests(createInitialTests());
     setObservations("Sem observações");
   };
@@ -365,7 +379,25 @@ export default function Home() {
                     id="environment"
                     value={environment}
                     onChange={(event) => setEnvironment(event.target.value)}
-                    placeholder="Link, branch, ambiente de homologação..."
+                    placeholder="Ex: Homologação, Produção..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="link">Link</Label>
+                  <Input
+                    id="link"
+                    value={link}
+                    onChange={(event) => setLink(event.target.value)}
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="branch">Branch</Label>
+                  <Input
+                    id="branch"
+                    value={branch}
+                    onChange={(event) => setBranch(event.target.value)}
+                    placeholder="Ex: feature/minha-branch"
                   />
                 </div>
               </CardContent>

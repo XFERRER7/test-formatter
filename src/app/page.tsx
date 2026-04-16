@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  BookOpen,
   ClipboardCopy,
   Download,
   FilePlus2,
@@ -108,6 +109,98 @@ const FIXED_CHECKS: { title: string; description: string }[] = [
 ];
 
 const STORAGE_KEY = "test-formatter-scripts";
+
+const MANUAL_CONTENT = `📘 Manual de Testes
+
+1. Validar o objetivo da task
+Antes de iniciar os testes, confirmar se a implementação atende exatamente ao que foi solicitado.
+Verificar:
+- Se a funcionalidade foi desenvolvida conforme a descrição da task
+- Se regras de negócio foram respeitadas
+- Se não ficou nada pendente ou parcialmente implementado
+- Se nomes, textos, labels e mensagens estão corretos
+
+2. Testar o fluxo principal
+Executar o cenário principal esperado da funcionalidade.
+Verificar:
+- Se o fluxo funciona do início ao fim
+- Se o resultado final é o esperado
+- Se não ocorre erro visual ou de sistema
+- Se os dados exibidos/salvos estão corretos
+Exemplo: Criar > Editar > Salvar > Consultar resultado
+
+3. Testar cenários alternativos
+Validar comportamentos diferentes do fluxo principal, mas ainda esperados.
+Verificar:
+- Ações com dados diferentes
+- Variações de preenchimento
+- Mudança de status
+- Diferentes perfis de usuário, se houver
+- Comportamento em outras rotas/telas relacionadas
+
+4. Testar validações
+Garantir que o sistema impede entradas inválidas e orienta o usuário corretamente.
+Verificar:
+- Campos obrigatórios
+- Formatos inválidos
+- Limites de caracteres
+- Valores nulos, vazios ou inconsistentes
+- Mensagens de erro exibidas corretamente
+
+5. Testar cenários negativos
+Executar ações incorretas ou fora do esperado para validar a segurança da funcionalidade.
+Verificar:
+- Se o sistema bloqueia operações indevidas
+- Se não quebra ao receber dados incorretos
+- Se apresenta mensagens claras
+- Se mantém a integridade das informações
+
+6. Validar persistência de dados
+Confirmar que os dados foram gravados, atualizados ou removidos corretamente.
+Verificar:
+- Se salvou no banco corretamente
+- Se refletiu na interface
+- Se após atualizar a página os dados permanecem corretos
+- Se não houve duplicidade de registros
+- Se não houve perda de dados existentes
+
+7. Validar impacto em funcionalidades relacionadas
+Garantir que a alteração não afetou outras partes do sistema.
+Verificar:
+- Telas relacionadas
+- Fluxos dependentes
+- Integrações
+- Relatórios
+- Listagens, filtros e dashboards afetados
+- Regras que usam o mesmo dado ou serviço
+
+8. Realizar teste de regressão básica
+Executar uma checagem rápida nas funcionalidades próximas à alteração.
+Verificar:
+- Se o que já funcionava continua funcionando
+- Se endpoints compartilhados continuam respondendo corretamente
+- Se componentes reutilizados não foram impactados
+- Se permissões e acessos continuam corretos
+
+9. Validar interface e usabilidade
+Conferir se a entrega está visualmente correta e coerente com o sistema.
+Verificar:
+- Alinhamento visual
+- Responsividade, quando aplicável
+- Botões, ícones e textos
+- Estados de carregamento
+- Mensagens de sucesso/erro
+- Comportamento de modal, tabela, formulário e paginação, se houver
+
+10. Validar logs e erros
+Garantir que não existem erros ocultos mesmo quando a funcionalidade aparentemente funciona.
+Verificar:
+- Console do navegador
+- Network das requisições
+- Logs do backend
+- Erros de build ou warnings relevantes
+- Status HTTP corretos
+`.trim();
 
 function generateId() {
   return Math.random().toString(36).substring(2, 11);
@@ -270,6 +363,16 @@ export default function Home() {
     URL.revokeObjectURL(url);
   };
 
+  const handleDownloadManual = () => {
+    const blob = new Blob([MANUAL_CONTENT], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "manual-de-testes.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-10">
@@ -289,15 +392,19 @@ export default function Home() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" onClick={handleNew}>
+              <Button variant="outline" onClick={handleDownloadManual} className="cursor-pointer">
+                <BookOpen className="h-4 w-4" />
+                Manual
+              </Button>
+              <Button variant="outline" onClick={handleNew} className="cursor-pointer">
                 <FilePlus2 className="h-4 w-4" />
                 Novo
               </Button>
-              <Button variant="outline" onClick={() => setShowSaved((state) => !state)}>
+              <Button variant="outline" onClick={() => setShowSaved((state) => !state)} className="cursor-pointer">
                 <FolderOpen className="h-4 w-4" />
                 Salvos ({savedScripts.length})
               </Button>
-              <Button onClick={handleSave}>
+              <Button onClick={handleSave} className="cursor-pointer">
                 <Save className="h-4 w-4" />
                 Salvar
               </Button>
@@ -343,6 +450,7 @@ export default function Home() {
                         size="icon"
                         onClick={() => handleDeleteScript(script.id)}
                         aria-label="Excluir roteiro"
+                        className="cursor-pointer"
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>

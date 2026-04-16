@@ -106,6 +106,11 @@ const FIXED_CHECKS: { title: string; description: string }[] = [
     description:
       "Testar a interface em diferentes tamanhos de tela para garantir que os elementos se ajustem corretamente.",
   },
+  {
+    title: "Testar cen\u00e1rios mais próximos da realidade",
+    description:
+      "Executar testes que simulem situações reais de uso para garantir que o sistema se comporta corretamente em condições práticas.",
+  }
 ];
 
 const STORAGE_KEY = "test-formatter-scripts";

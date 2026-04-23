@@ -1,22 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f9fc;
-  --foreground: #111827;
+  --background: #eef2ff;
+  --foreground: #1e1b4b;
   --card: #ffffff;
-  --card-foreground: #111827;
-  --primary: #1f2937;
-  --primary-foreground: #f8fafc;
-  --secondary: #eef2f7;
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #e2e8f0;
-  --accent-foreground: #111827;
+  --card-foreground: #1e1b4b;
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #e0e7ff;
+  --secondary-foreground: #3730a3;
+  --muted: #f5f3ff;
+  --muted-foreground: #6b7280;
+  --accent: #c7d2fe;
+  --accent-foreground: #3730a3;
   --destructive: #dc2626;
-  --border: #e2e8f0;
-  --input: #d8e0ec;
-  --ring: #3b82f6;
+  --border: #c7d2fe;
+  --input: #e0e7ff;
+  --ring: #4f46e5;
 }
 
 @theme inline {
@@ -36,18 +36,19 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter), "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Fira Code", "Cascadia Code", "Consolas", monospace;
 }
 
 body {
-  background: radial-gradient(circle at 12% 0%, #ffffff 0%, var(--background) 55%);
+  background: linear-gradient(150deg, #eef2ff 0%, #f5f3ff 50%, #ede9fe 100%);
+  background-attachment: fixed;
   color: var(--foreground);
-  font-family: var(--font-sans), "Segoe UI", sans-serif;
+  font-family: var(--font-sans);
   min-height: 100vh;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+  scrollbar-color: var(--accent) transparent;
 }

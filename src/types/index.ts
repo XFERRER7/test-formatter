@@ -41,4 +41,20 @@ export interface ExecutionMeta {
   branch: string;
 }
 
-export type ActiveView = "criar" | "executar";
+export interface ExecutionDraft {
+  functionality: string;
+  environment: string;
+  link: string;
+  branch: string;
+  tests: TestItem[];
+}
+
+export interface ExecutionReportPayload {
+  version: 1;
+  generatedAt: string;
+  executionStartedAt: string;
+  meta: ExecutionMeta;
+  items: ExecutionItem[];
+}
+
+export type ActiveView = "criar" | "executar" | "resultados";

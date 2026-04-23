@@ -1,18 +1,17 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { buildExecutionResultText, downloadFile } from "@/lib/export";
-import { buildExecutionItems, parseScriptText } from "@/lib/script-utils";
+import { buildExecutionResultText } from "@/lib/export";
+import { buildExecutionReportJson, buildExecutionReportPayload } from "@/lib/result-json";
+import { buildExecutionItems } from "@/lib/script-utils";
 import type { ExecutionItem, ExecutionMeta, TestItem, TestResult } from "@/types";
 
 export function useExecution() {
   const [executionScript, setExecutionScript] = useState<ExecutionMeta | null>(null);
   const [executionItems, setExecutionItems] = useState<ExecutionItem[]>([]);
   const [executionStartedAt, setExecutionStartedAt] = useState("");
-  const [pasteText, setPasteText] = useState("");
-  const [showPasteInput, setShowPasteInput] = useState(false);
-  const [pasteError, setPasteError] = useState("");
   const [executionCopied, setExecutionCopied] = useState(false);
+  const [jsonCopied, setJsonCopied] = useState(false);
 
   const initExecution = (script: {
     functionality: string;
@@ -54,10 +53,14 @@ export function useExecution() {
     return buildExecutionResultText(executionScript, executionItems, executionStartedAt);
   }, [executionScript, executionItems, executionStartedAt]);
 
-  const handleExport = () => {
-    if (!executionScript) return;
-    downloadFile(getResultText(), `execucao-${executionScript.functionality || "teste"}.txt`);
-  };
+  const getReportPayload = useCallback(() => {
+    if (!executionScript) return null;
+    return buildExecutionReportPayload(
+      executionScript,
+      executionItems,
+      executionStartedAt
+    );
+  }, [executionScript, executionItems, executionStartedAt]);
 
   const handleCopyResult = useCallback(async () => {
     await navigator.clipboard.writeText(getResultText());
@@ -65,21 +68,14 @@ export function useExecution() {
     setTimeout(() => setExecutionCopied(false), 1800);
   }, [getResultText]);
 
-  const handleExecuteFromPaste = () => {
-    setPasteError("");
-    const parsed = parseScriptText(pasteText);
-    if (!parsed || parsed.items.length === 0) {
-      setPasteError(
-        "Não foi possível identificar itens de teste no texto. Certifique-se de colar um roteiro gerado por esta ferramenta."
-      );
-      return;
-    }
-    setExecutionScript(parsed.meta);
-    setExecutionItems(parsed.items);
-    setExecutionStartedAt(new Date().toLocaleString("pt-BR"));
-    setPasteText("");
-    setShowPasteInput(false);
-  };
+  const handleCopyJson = useCallback(async () => {
+    if (!executionScript) return;
+    await navigator.clipboard.writeText(
+      buildExecutionReportJson(executionScript, executionItems, executionStartedAt)
+    );
+    setJsonCopied(true);
+    setTimeout(() => setJsonCopied(false), 1800);
+  }, [executionItems, executionScript, executionStartedAt]);
 
   const resetExecution = () => setExecutionScript(null);
 
@@ -87,18 +83,16 @@ export function useExecution() {
     executionScript,
     executionItems,
     executionStartedAt,
-    pasteText, setPasteText,
-    showPasteInput, setShowPasteInput,
-    pasteError, setPasteError,
     executionCopied,
+    jsonCopied,
     initExecution,
     updateResult,
     updateNotes,
     handleReset,
-    handleExport,
     handleCopyResult,
-    handleExecuteFromPaste,
+    handleCopyJson,
     resetExecution,
+    getReportPayload,
   };
 }
 

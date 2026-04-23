@@ -5,9 +5,8 @@ import {
   Circle,
   ClipboardCopy,
   ClipboardList,
-  Download,
+  FileJson,
   MinusCircle,
-  RotateCcw,
   XCircle,
 } from "lucide-react";
 
@@ -32,10 +31,10 @@ interface ExecutionBoardProps
     | "executionStartedAt"
     | "updateResult"
     | "updateNotes"
-    | "handleReset"
-    | "handleExport"
     | "handleCopyResult"
+    | "handleCopyJson"
     | "executionCopied"
+    | "jsonCopied"
     | "resetExecution"
   > {}
 
@@ -45,10 +44,10 @@ export function ExecutionBoard({
   executionStartedAt,
   updateResult,
   updateNotes,
-  handleReset,
-  handleExport,
   handleCopyResult,
+  handleCopyJson,
   executionCopied,
+  jsonCopied,
   resetExecution,
 }: ExecutionBoardProps) {
   if (!executionScript) return null;
@@ -102,17 +101,13 @@ export function ExecutionBoard({
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" onClick={handleReset}>
-                <RotateCcw className="h-4 w-4" />
-                Reiniciar
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleExport}>
-                <Download className="h-4 w-4" />
-                Exportar
-              </Button>
               <Button variant="outline" size="sm" onClick={handleCopyResult}>
                 <ClipboardCopy className="h-4 w-4" />
-                {executionCopied ? "Copiado!" : "Copiar resultado"}
+                {executionCopied ? "Texto copiado!" : "Copiar texto"}
+              </Button>
+              <Button size="sm" onClick={handleCopyJson}>
+                <FileJson className="h-4 w-4" />
+                {jsonCopied ? "JSON copiado!" : "Copiar JSON"}
               </Button>
               <Button variant="outline" size="sm" onClick={resetExecution}>
                 <ClipboardList className="h-4 w-4" />

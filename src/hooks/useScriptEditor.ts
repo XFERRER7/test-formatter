@@ -20,6 +20,7 @@ export function useScriptEditor() {
   const [tests, setTests] = useState<TestItem[]>(createInitialTests());
   const [observations, setObservations] = useState("Sem observações");
   const [copied, setCopied] = useState(false);
+  const [jsonCopied, setJsonCopied] = useState(false);
   const [savedScripts, setSavedScripts] = useState<TestScript[]>([]);
   const [showSaved, setShowSaved] = useState(false);
   const [savedNotice, setSavedNotice] = useState("");
@@ -38,6 +39,13 @@ export function useScriptEditor() {
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   }, [formatted]);
+
+  const handleCopyJson = useCallback(async () => {
+    const draft = { functionality, environment, link, branch, tests };
+    await navigator.clipboard.writeText(JSON.stringify(draft, null, 2));
+    setJsonCopied(true);
+    setTimeout(() => setJsonCopied(false), 1800);
+  }, [functionality, environment, link, branch, tests]);
 
   const addTest = (category: TestCategory) => {
     setTests((prev) => [...prev, createEmptyTest(category)]);
@@ -95,10 +103,6 @@ export function useScriptEditor() {
     setObservations("Sem observações");
   };
 
-  const handleExportTxt = () => {
-    downloadFile(formatted, `roteiro-${functionality || "teste"}.txt`);
-  };
-
   const handleDownloadManual = () => {
     downloadFile(MANUAL_CONTENT, "manual-de-testes.txt");
   };
@@ -115,6 +119,7 @@ export function useScriptEditor() {
     observations, setObservations,
     formatted,
     copied,
+    jsonCopied,
     savedScripts,
     showSaved, setShowSaved,
     savedNotice,
@@ -127,7 +132,7 @@ export function useScriptEditor() {
     handleDelete,
     handleNew,
     handleCopy,
-    handleExportTxt,
+    handleCopyJson,
     handleDownloadManual,
   };
 }

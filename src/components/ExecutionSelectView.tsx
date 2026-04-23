@@ -1,12 +1,11 @@
 "use client";
 
-import { ClipboardPaste, Play, XCircle } from "lucide-react";
+import { useState } from "react";
+import { ClipboardPaste, Play } from "lucide-react";
 
 import { FIXED_CHECKS } from "@/constants/test-data";
-import type { ExecutionHook } from "@/hooks/useExecution";
-import type { TestItem, TestScript } from "@/types";
+import type { ExecutionDraft, TestItem, TestScript } from "@/types";
 
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,27 +13,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 
-interface ExecutionSelectViewProps
-  extends Pick<
-    ExecutionHook,
-    | "pasteText"
-    | "setPasteText"
-    | "showPasteInput"
-    | "setShowPasteInput"
-    | "pasteError"
-    | "setPasteError"
-    | "handleExecuteFromPaste"
-  > {
+interface ExecutionSelectViewProps {
   savedScripts: TestScript[];
-  currentScript: {
-    functionality: string;
-    environment: string;
-    link: string;
-    branch: string;
-    tests: TestItem[];
-  };
+  currentScript: ExecutionDraft | null;
   onInitExecution: (script: {
     functionality: string;
     environment: string;
@@ -44,46 +26,83 @@ interface ExecutionSelectViewProps
   }) => void;
 }
 
+function parseScriptJson(text: string): ExecutionDraft | null {
+  try {
+    const parsed = JSON.parse(text);
+    if (!parsed || typeof parsed !== "object") return null;
+    if (!Array.isArray(parsed.tests)) return null;
+    return {
+      functionality: String(parsed.functionality ?? ""),
+      environment: String(parsed.environment ?? ""),
+      link: String(parsed.link ?? ""),
+      branch: String(parsed.branch ?? ""),
+      tests: parsed.tests as TestItem[],
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function ExecutionSelectView({
   savedScripts,
   currentScript,
   onInitExecution,
-  pasteText, setPasteText,
-  showPasteInput, setShowPasteInput,
-  pasteError, setPasteError,
-  handleExecuteFromPaste,
 }: ExecutionSelectViewProps) {
+  const [showJsonInput, setShowJsonInput] = useState(false);
+  const [jsonInput, setJsonInput] = useState("");
+  const [jsonError, setJsonError] = useState("");
+
+  const hasDraft =
+    currentScript !== null &&
+    (Boolean(currentScript.functionality.trim()) ||
+      Boolean(currentScript.environment.trim()) ||
+      currentScript.tests.some((test) => test.description.trim()));
+
+  function handleImportJson() {
+    const draft = parseScriptJson(jsonInput);
+    if (!draft) {
+      setJsonError("JSON inválido. Certifique-se de colar um roteiro exportado pelo sistema.");
+      return;
+    }
+    setJsonError("");
+    setJsonInput("");
+    setShowJsonInput(false);
+    onInitExecution(draft);
+  }
+
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-border bg-card/90 p-6 shadow-sm backdrop-blur">
         <h2 className="text-xl font-semibold tracking-tight">Executar Testes</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Selecione um roteiro salvo ou execute o roteiro atual do formulário.
+          Escolha um roteiro salvo, use o rascunho atual ou importe um roteiro via JSON.
         </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Card
-          className="cursor-pointer border-dashed transition-colors hover:border-primary hover:bg-muted/40"
-          onClick={() => onInitExecution(currentScript)}
-        >
-          <CardHeader>
-            <CardTitle className="text-base">
-              {currentScript.functionality || "Roteiro atual"}
-            </CardTitle>
-            <CardDescription>
-              {currentScript.environment
-                ? `Ambiente: ${currentScript.environment}`
-                : "Do formulário atual"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Play className="h-4 w-4" />
-              <span>Usar roteiro do formulário</span>
-            </div>
-          </CardContent>
-        </Card>
+        {hasDraft && currentScript ? (
+          <Card
+            className="cursor-pointer border-dashed transition-colors hover:border-primary hover:bg-muted/40"
+            onClick={() => onInitExecution(currentScript)}
+          >
+            <CardHeader>
+              <CardTitle className="text-base">
+                {currentScript.functionality || "Roteiro em rascunho"}
+              </CardTitle>
+              <CardDescription>
+                {currentScript.environment
+                  ? `Ambiente: ${currentScript.environment}`
+                  : "Vindo da tela de criação"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Play className="h-4 w-4" />
+                <span>Usar roteiro em rascunho</span>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
 
         {savedScripts.map((script) => (
           <Card
@@ -106,57 +125,53 @@ export function ExecutionSelectView({
         ))}
       </div>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-base">Colar roteiro</CardTitle>
-              <CardDescription>
-                Cole o texto de um roteiro gerado por esta ferramenta para iniciar a execução.
-              </CardDescription>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setShowPasteInput((p) => !p);
-                setPasteError("");
-              }}
-            >
-              <ClipboardPaste className="h-4 w-4" />
-              {showPasteInput ? "Cancelar" : "Colar texto"}
-            </Button>
+      {/* JSON import section */}
+      <div className="rounded-2xl border border-border bg-card/90 p-6 shadow-sm backdrop-blur">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-semibold">Importar roteiro via JSON</h3>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              Cole o JSON de um roteiro exportado para iniciar a execução.
+            </p>
           </div>
-        </CardHeader>
-        {showPasteInput && (
-          <CardContent className="space-y-3">
-            <Textarea
-              value={pasteText}
+          <button
+            onClick={() => {
+              setShowJsonInput((v) => !v);
+              setJsonError("");
+              setJsonInput("");
+            }}
+            className="flex items-center gap-2 rounded-lg border border-border bg-muted px-4 py-2 text-sm font-medium transition-colors hover:bg-muted/70"
+          >
+            <ClipboardPaste className="h-4 w-4" />
+            {showJsonInput ? "Cancelar" : "Colar JSON"}
+          </button>
+        </div>
+
+        {showJsonInput && (
+          <div className="mt-4 space-y-3">
+            <textarea
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+              rows={8}
+              placeholder='Cole aqui o JSON do roteiro, ex: {"functionality":"...","tests":[...]}'
+              value={jsonInput}
               onChange={(e) => {
-                setPasteText(e.target.value);
-                setPasteError("");
+                setJsonInput(e.target.value);
+                setJsonError("");
               }}
-              placeholder="Cole aqui o texto do roteiro gerado..."
-              rows={10}
-              className="font-mono text-xs"
             />
-            {pasteError && (
-              <p className="flex items-center gap-1.5 text-xs text-red-600">
-                <XCircle className="h-3.5 w-3.5 shrink-0" />
-                {pasteError}
-              </p>
+            {jsonError && (
+              <p className="text-sm text-destructive">{jsonError}</p>
             )}
-            <Button
-              onClick={handleExecuteFromPaste}
-              disabled={!pasteText.trim()}
-              className="w-full"
+            <button
+              onClick={handleImportJson}
+              disabled={!jsonInput.trim()}
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
-              <Play className="h-4 w-4" />
               Iniciar execução
-            </Button>
-          </CardContent>
+            </button>
+          </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }

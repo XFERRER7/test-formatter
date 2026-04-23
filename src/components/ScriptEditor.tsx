@@ -3,7 +3,6 @@
 import {
   BookOpen,
   ClipboardCopy,
-  Download,
   FilePlus2,
   FolderOpen,
   Play,
@@ -51,12 +50,13 @@ export function ScriptEditor({
   observations, setObservations,
   formatted,
   copied,
+  jsonCopied,
   savedScripts,
   showSaved, setShowSaved,
   savedNotice,
   addTest, updateTest, removeTest,
   handleSave, handleLoad, handleDelete, handleNew,
-  handleCopy, handleExportTxt, handleDownloadManual,
+  handleCopy, handleCopyJson, handleDownloadManual,
   onInitExecution,
 }: ScriptEditorProps) {
   return (
@@ -325,13 +325,13 @@ export function ScriptEditor({
                   </CardDescription>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={handleExportTxt}>
-                    <Download className="h-4 w-4" />
-                    TXT
+                  <Button variant="outline" onClick={handleCopyJson}>
+                    <ClipboardCopy className="h-4 w-4" />
+                    {jsonCopied ? "Copiado" : "Copiar JSON"}
                   </Button>
                   <Button onClick={handleCopy}>
                     <ClipboardCopy className="h-4 w-4" />
-                    {copied ? "Copiado" : "Copiar"}
+                    {copied ? "Copiado" : "Copiar texto"}
                   </Button>
                 </div>
               </div>

@@ -13,6 +13,7 @@ export interface TestItem {
 export interface TestScript {
   id: string;
   name: string;
+  project: string;
   functionality: string;
   environment: string;
   link: string;
@@ -37,6 +38,7 @@ export interface ExecutionItem {
 }
 
 export interface ExecutionMeta {
+  project: string;
   functionality: string;
   environment: string;
   link: string;
@@ -46,6 +48,7 @@ export interface ExecutionMeta {
 }
 
 export interface ExecutionDraft {
+  project: string;
   functionality: string;
   environment: string;
   link: string;
@@ -63,4 +66,4 @@ export interface ExecutionReportPayload {
   items: ExecutionItem[];
 }
 
-export type ActiveView = "criar" | "executar" | "resultados";
+export type ActiveView = "criar" | "executar";

@@ -1,17 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import {
   CheckCircle2,
   Circle,
   ClipboardCopy,
   ClipboardList,
   FileJson,
+  FileText,
+  Lock,
   MinusCircle,
   XCircle,
 } from "lucide-react";
 
 import { CATEGORIES, CATEGORY_LABELS } from "@/constants/test-data";
 import type { ExecutionHook } from "@/hooks/useExecution";
+import { printExecutionReport } from "@/lib/print-report";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -50,6 +54,8 @@ export function ExecutionBoard({
   jsonCopied,
   resetExecution,
 }: ExecutionBoardProps) {
+  const [finalized, setFinalized] = useState(false);
+
   if (!executionScript) return null;
 
   return (
@@ -62,6 +68,9 @@ export function ExecutionBoard({
                 {executionScript.functionality || "Execução de Testes"}
               </CardTitle>
               <CardDescription className="mt-1 flex flex-wrap gap-x-4">
+                {executionScript.project && (
+                  <span>Projeto: {executionScript.project}</span>
+                )}
                 {executionScript.environment && (
                   <span>Ambiente: {executionScript.environment}</span>
                 )}
@@ -107,22 +116,54 @@ export function ExecutionBoard({
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" onClick={handleCopyResult}>
+              <Button variant="outline" size="sm" onClick={handleCopyResult} disabled={finalized}>
                 <ClipboardCopy className="h-4 w-4" />
                 {executionCopied ? "Texto copiado!" : "Copiar texto"}
               </Button>
-              <Button size="sm" onClick={handleCopyJson}>
+              <Button size="sm" onClick={handleCopyJson} disabled={finalized}>
                 <FileJson className="h-4 w-4" />
                 {jsonCopied ? "JSON copiado!" : "Copiar JSON"}
               </Button>
-              <Button variant="outline" size="sm" onClick={resetExecution}>
+              <Button variant="outline" size="sm" onClick={resetExecution} disabled={finalized}>
                 <ClipboardList className="h-4 w-4" />
                 Trocar roteiro
               </Button>
+              {!finalized ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-green-600 text-green-700 hover:bg-green-50"
+                  onClick={() => setFinalized(true)}
+                >
+                  <Lock className="h-4 w-4" />
+                  Finalizar teste
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={() =>
+                    printExecutionReport(executionScript, executionItems, executionStartedAt ?? "")
+                  }
+                >
+                  <FileText className="h-4 w-4" />
+                  Exportar PDF
+                </Button>
+              )}
             </div>
           </div>
         </CardHeader>
       </Card>
+
+      {finalized && (
+        <div className="flex items-center gap-3 rounded-xl border border-green-300 bg-green-50 px-5 py-3 text-sm text-green-800">
+          <Lock className="h-4 w-4 shrink-0" />
+          <span>
+            <strong>Execução finalizada.</strong> Os resultados estão bloqueados para edição. Clique em{" "}
+            <strong>Exportar PDF</strong> para salvar o relatório.
+          </span>
+        </div>
+      )}
 
       {CATEGORIES.map((category) => {
         const items = executionItems.filter(
@@ -141,8 +182,8 @@ export function ExecutionBoard({
                 <ExecutionItemCard
                   key={item.id}
                   item={item}
-                  onResultChange={updateResult}
-                  onNotesChange={updateNotes}
+                  onResultChange={finalized ? () => {} : updateResult}
+                  onNotesChange={finalized ? () => {} : updateNotes}
                 />
               ))}
             </CardContent>
@@ -168,8 +209,8 @@ export function ExecutionBoard({
                 <ExecutionItemCard
                   key={item.id}
                   item={item}
-                  onResultChange={updateResult}
-                  onNotesChange={updateNotes}
+                  onResultChange={finalized ? () => {} : updateResult}
+                  onNotesChange={finalized ? () => {} : updateNotes}
                 />
               ))}
           </CardContent>

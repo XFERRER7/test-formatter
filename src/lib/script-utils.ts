@@ -4,7 +4,7 @@ import {
   FIXED_CHECKS,
   LABEL_TO_CATEGORY,
 } from "@/constants/test-data";
-import type { ExecutionItem, ExecutionMeta, TestCategory, TestItem } from "@/types";
+import type { ExecutionDraft, ExecutionItem, ExecutionMeta, TestCategory, TestItem } from "@/types";
 
 export function generateId(): string {
   return Math.random().toString(36).substring(2, 11);
@@ -19,6 +19,7 @@ export function createInitialTests(): TestItem[] {
 }
 
 export function formatScript(script: {
+  project: string;
   functionality: string;
   environment: string;
   link: string;
@@ -30,6 +31,7 @@ export function formatScript(script: {
 }): string {
   const lines: string[] = [];
   lines.push("🛠️ Roteiro de Teste");
+  if (script.project) lines.push(`Projeto: ${script.project}`);
   lines.push(`Funcionalidade: ${script.functionality}`);
   lines.push(`Ambiente: ${script.environment}`);
   if (script.link) lines.push(`Link: ${script.link}`);
@@ -96,6 +98,7 @@ export function parseScriptText(text: string): {
   items: ExecutionItem[];
 } | null {
   const lines = text.split("\n");
+  let project = "";
   let functionality = "";
   let environment = "";
   let link = "";
@@ -109,7 +112,9 @@ export function parseScriptText(text: string): {
     const line = raw.trim();
     if (!line) continue;
 
-    if (line.startsWith("Funcionalidade:")) {
+    if (line.startsWith("Projeto:")) {
+      project = line.replace("Projeto:", "").trim();
+    } else if (line.startsWith("Funcionalidade:")) {
       functionality = line.replace("Funcionalidade:", "").trim();
     } else if (line.startsWith("Ambiente:")) {
       environment = line.replace("Ambiente:", "").trim();
@@ -164,5 +169,55 @@ export function parseScriptText(text: string): {
   }
 
   if (items.length === 0 && !functionality) return null;
-  return { meta: { functionality, environment, link, branch, tester, developer }, items };
+  return { meta: { project, functionality, environment, link, branch, tester, developer }, items };
+}
+
+/**
+ * Accepts either a JSON string (ExecutionDraft shape) or a plain-text roteiro
+ * (output of formatScript / "Copiar texto") and returns an ExecutionDraft.
+ */
+export function parseDraftFromInput(text: string): ExecutionDraft | null {
+  const trimmed = text.trim();
+  if (!trimmed) return null;
+
+  // Try JSON first
+  if (trimmed.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (!parsed || typeof parsed !== "object" || !Array.isArray(parsed.tests)) return null;
+      return {
+        project: String(parsed.project ?? ""),
+        functionality: String(parsed.functionality ?? ""),
+        environment: String(parsed.environment ?? ""),
+        link: String(parsed.link ?? ""),
+        branch: String(parsed.branch ?? ""),
+        tester: String(parsed.tester ?? ""),
+        developer: String(parsed.developer ?? ""),
+        tests: parsed.tests as TestItem[],
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  // Fall back to plain text
+  const result = parseScriptText(trimmed);
+  if (!result) return null;
+  const { meta, items } = result;
+  return {
+    project: meta.project,
+    functionality: meta.functionality,
+    environment: meta.environment,
+    link: meta.link,
+    branch: meta.branch,
+    tester: meta.tester,
+    developer: meta.developer,
+    tests: items
+      .filter((i) => !i.isFixed)
+      .map((i) => ({
+        id: i.id,
+        category: i.category as TestItem["category"],
+        description: i.description,
+      })),
+  };
 }

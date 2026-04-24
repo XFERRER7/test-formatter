@@ -1,4 +1,4 @@
-import { ArrowRight, BarChart2, ClipboardList, FileEdit, Sparkles } from "lucide-react";
+import { ArrowRight, ClipboardList, FileEdit, GitMerge, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 import { AppNav } from "@/components/AppNav";
@@ -21,12 +21,12 @@ const FEATURES = [
     accent: "from-emerald-500 via-teal-500 to-cyan-500",
   },
   {
-    href: "/resultados",
-    title: "Resultados técnicos",
+    href: "/validacao",
+    title: "Validação de Build",
     description:
-      "Cole o JSON recebido para enxergar um resumo analítico com cards, alertas e agrupamentos por categoria.",
-    icon: BarChart2,
-    accent: "from-amber-500 via-orange-500 to-rose-500",
+      "Cole múltiplos roteiros (JSON ou texto), mescle os cenários automaticamente e execute tudo de uma vez.",
+    icon: GitMerge,
+    accent: "from-violet-500 via-purple-500 to-fuchsia-500",
   },
 ] as const;
 
@@ -43,10 +43,10 @@ export default function HomePage() {
               Menu principal
             </div>
             <h1 className="mt-5 max-w-2xl text-4xl font-semibold tracking-tight text-balance">
-              Três fluxos claros para preparar, executar e interpretar resultados.
+              Fluxos claros para preparar, executar e validar testes.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-foreground/75">
-              O QA monta o roteiro, executa os testes e entrega um JSON padronizado. O programador abre a página de resultados e analisa o cenário com uma leitura visual mais útil.
+              O QA monta o roteiro, executa os testes e exporta um relatório em PDF. Para validações de build, mescle múltiplos roteiros e execute tudo de uma vez.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -57,10 +57,10 @@ export default function HomePage() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/resultados"
+                href="/validacao"
                 className="inline-flex items-center gap-2 rounded-2xl border border-border bg-white/70 px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-white"
               >
-                Abrir leitura técnica
+                Validação de Build
               </Link>
             </div>
           </div>

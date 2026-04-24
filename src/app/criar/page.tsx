@@ -18,6 +18,7 @@ export default function CriarPage() {
   }, [editor.currentScriptSnapshot]);
 
   const handleInitExecution = (script: {
+    project: string;
     functionality: string;
     environment: string;
     link: string;

@@ -13,6 +13,7 @@ import { loadSavedScripts, persistScripts } from "@/lib/storage";
 import type { TestCategory, TestItem, TestScript } from "@/types";
 
 export function useScriptEditor() {
+  const [project, setProject] = useState("");
   const [functionality, setFunctionality] = useState("");
   const [environment, setEnvironment] = useState("");
   const [link, setLink] = useState("");
@@ -32,8 +33,8 @@ export function useScriptEditor() {
   }, []);
 
   const formatted = useMemo(
-    () => formatScript({ functionality, environment, link, branch, tester, developer, tests, observations }),
-    [functionality, environment, link, branch, tester, developer, observations, tests]
+    () => formatScript({ project, functionality, environment, link, branch, tester, developer, tests, observations }),
+    [project, functionality, environment, link, branch, tester, developer, observations, tests]
   );
 
   const handleCopy = useCallback(async () => {
@@ -43,11 +44,11 @@ export function useScriptEditor() {
   }, [formatted]);
 
   const handleCopyJson = useCallback(async () => {
-    const draft = { functionality, environment, link, branch, tester, developer, tests };
+    const draft = { project, functionality, environment, link, branch, tester, developer, tests };
     await navigator.clipboard.writeText(JSON.stringify(draft, null, 2));
     setJsonCopied(true);
     setTimeout(() => setJsonCopied(false), 1800);
-  }, [functionality, environment, link, branch, tester, developer, tests]);
+  }, [project, functionality, environment, link, branch, tester, developer, tests]);
 
   const addTest = (category: TestCategory) => {
     setTests((prev) => [...prev, createEmptyTest(category)]);
@@ -65,6 +66,7 @@ export function useScriptEditor() {
     const script: TestScript = {
       id: generateId(),
       name: functionality || "Roteiro sem nome",
+      project,
       functionality,
       environment,
       link,
@@ -83,6 +85,7 @@ export function useScriptEditor() {
   };
 
   const handleLoad = (script: TestScript) => {
+    setProject(script.project ?? "");
     setFunctionality(script.functionality);
     setEnvironment(script.environment);
     setLink(script.link ?? "");
@@ -101,6 +104,7 @@ export function useScriptEditor() {
   };
 
   const handleNew = () => {
+    setProject("");
     setFunctionality("");
     setEnvironment("");
     setLink("");
@@ -116,9 +120,10 @@ export function useScriptEditor() {
   };
 
   // Expose current script snapshot for the execution flow
-  const currentScriptSnapshot = { functionality, environment, link, branch, tester, developer, tests };
+  const currentScriptSnapshot = { project, functionality, environment, link, branch, tester, developer, tests };
 
   return {
+    project, setProject,
     functionality, setFunctionality,
     environment, setEnvironment,
     link, setLink,

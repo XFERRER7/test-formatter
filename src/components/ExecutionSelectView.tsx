@@ -6,6 +6,7 @@ import { ClipboardPaste, Play } from "lucide-react";
 import { FIXED_CHECKS } from "@/constants/test-data";
 import type { ExecutionDraft, TestItem, TestScript } from "@/types";
 
+import { parseDraftFromInput } from "@/lib/script-utils";
 import {
   Card,
   CardContent,
@@ -18,6 +19,7 @@ interface ExecutionSelectViewProps {
   savedScripts: TestScript[];
   currentScript: ExecutionDraft | null;
   onInitExecution: (script: {
+    project: string;
     functionality: string;
     environment: string;
     link: string;
@@ -28,23 +30,8 @@ interface ExecutionSelectViewProps {
   }) => void;
 }
 
-function parseScriptJson(text: string): ExecutionDraft | null {
-  try {
-    const parsed = JSON.parse(text);
-    if (!parsed || typeof parsed !== "object") return null;
-    if (!Array.isArray(parsed.tests)) return null;
-    return {
-      functionality: String(parsed.functionality ?? ""),
-      environment: String(parsed.environment ?? ""),
-      link: String(parsed.link ?? ""),
-      branch: String(parsed.branch ?? ""),
-      tester: String(parsed.tester ?? ""),
-      developer: String(parsed.developer ?? ""),
-      tests: parsed.tests as TestItem[],
-    };
-  } catch {
-    return null;
-  }
+function parseInput(text: string): ExecutionDraft | null {
+  return parseDraftFromInput(text);
 }
 
 export function ExecutionSelectView({
@@ -63,9 +50,9 @@ export function ExecutionSelectView({
       currentScript.tests.some((test) => test.description.trim()));
 
   function handleImportJson() {
-    const draft = parseScriptJson(jsonInput);
+    const draft = parseInput(jsonInput);
     if (!draft) {
-      setJsonError("JSON inválido. Certifique-se de colar um roteiro exportado pelo sistema.");
+      setJsonError("Formato inválido. Cole um JSON ou o texto copiado do roteiro.");
       return;
     }
     setJsonError("");
@@ -133,9 +120,9 @@ export function ExecutionSelectView({
       <div className="rounded-2xl border border-border bg-card/90 p-6 shadow-sm backdrop-blur">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base font-semibold">Importar roteiro via JSON</h3>
+            <h3 className="text-base font-semibold">Importar roteiro (JSON ou texto)</h3>
             <p className="mt-0.5 text-sm text-muted-foreground">
-              Cole o JSON de um roteiro exportado para iniciar a execução.
+              Cole o JSON ou o texto copiado de um roteiro para iniciar a execução.
             </p>
           </div>
           <button
@@ -147,7 +134,7 @@ export function ExecutionSelectView({
             className="flex items-center gap-2 rounded-lg border border-border bg-muted px-4 py-2 text-sm font-medium transition-colors hover:bg-muted/70"
           >
             <ClipboardPaste className="h-4 w-4" />
-            {showJsonInput ? "Cancelar" : "Colar JSON"}
+            {showJsonInput ? "Cancelar" : "Colar roteiro"}
           </button>
         </div>
 
@@ -156,7 +143,7 @@ export function ExecutionSelectView({
             <textarea
               className="w-full rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
               rows={8}
-              placeholder='Cole aqui o JSON do roteiro, ex: {"functionality":"...","tests":[...]}'
+              placeholder={`Cole aqui o JSON ou o texto do roteiro:\n\n🛠️ Roteiro de Teste\nFuncionalidade: ...\n\nou\n\n{"functionality":"...","tests":[...]}`}
               value={jsonInput}
               onChange={(e) => {
                 setJsonInput(e.target.value);

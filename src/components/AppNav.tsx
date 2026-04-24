@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart2, ClipboardList, Compass, FileEdit } from "lucide-react";
+import { ClipboardList, Compass, FileEdit, GitMerge } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -20,10 +20,10 @@ const NAV_ITEMS = [
     icon: ClipboardList,
   },
   {
-    href: "/resultados",
-    label: "Resultados",
-    description: "Cole o JSON recebido e visualize o relatório.",
-    icon: BarChart2,
+    href: "/validacao",
+    label: "Validação de Build",
+    description: "Mescle múltiplos roteiros e execute de uma vez.",
+    icon: GitMerge,
   },
 ] as const;
 

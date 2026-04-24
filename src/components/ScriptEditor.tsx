@@ -33,6 +33,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 interface ScriptEditorProps extends ScriptEditorHook {
   onInitExecution: (script: {
+    project: string;
     functionality: string;
     environment: string;
     link: string;
@@ -44,6 +45,7 @@ interface ScriptEditorProps extends ScriptEditorHook {
 }
 
 export function ScriptEditor({
+  project, setProject,
   functionality, setFunctionality,
   environment, setEnvironment,
   link, setLink,
@@ -100,7 +102,7 @@ export function ScriptEditor({
             <Button
               variant="outline"
               className="cursor-pointer"
-              onClick={() => onInitExecution({ functionality, environment, link, branch, tester, developer, tests })}
+              onClick={() => onInitExecution({ project, functionality, environment, link, branch, tester, developer, tests })}
             >
               <Play className="h-4 w-4" />
               Executar
@@ -182,6 +184,15 @@ export function ScriptEditor({
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="project">Projeto</Label>
+                <Input
+                  id="project"
+                  value={project}
+                  onChange={(e) => setProject(e.target.value)}
+                  placeholder="Nome do projeto"
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="functionality">Funcionalidade</Label>
                 <Input

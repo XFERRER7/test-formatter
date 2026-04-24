@@ -14,6 +14,7 @@ export function useExecution() {
   const [jsonCopied, setJsonCopied] = useState(false);
 
   const initExecution = (script: {
+    project: string;
     functionality: string;
     environment: string;
     link: string;
@@ -23,6 +24,7 @@ export function useExecution() {
     tests: TestItem[];
   }) => {
     setExecutionScript({
+      project: script.project ?? "",
       functionality: script.functionality,
       environment: script.environment,
       link: script.link ?? "",

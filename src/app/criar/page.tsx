@@ -22,6 +22,8 @@ export default function CriarPage() {
     environment: string;
     link: string;
     branch: string;
+    tester: string;
+    developer: string;
     tests: TestItem[];
   }) => {
     saveExecutionDraft(script);

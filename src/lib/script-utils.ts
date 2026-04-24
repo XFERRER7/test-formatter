@@ -100,6 +100,8 @@ export function parseScriptText(text: string): {
   let environment = "";
   let link = "";
   let branch = "";
+  let tester = "";
+  let developer = "";
   const items: ExecutionItem[] = [];
   let section: "header" | "checklist" | "observations" | "padrao" = "header";
 
@@ -115,6 +117,10 @@ export function parseScriptText(text: string): {
       link = line.replace("Link:", "").trim();
     } else if (line.startsWith("Branch:")) {
       branch = line.replace("Branch:", "").trim();
+    } else if (line.startsWith("Tester:")) {
+      tester = line.replace("Tester:", "").trim();
+    } else if (line.startsWith("Desenvolvedor:")) {
+      developer = line.replace("Desenvolvedor:", "").trim();
     } else if (line.startsWith("📋")) {
       section = "checklist";
     } else if (line.startsWith("⚠️")) {
@@ -158,5 +164,5 @@ export function parseScriptText(text: string): {
   }
 
   if (items.length === 0 && !functionality) return null;
-  return { meta: { functionality, environment, link, branch }, items };
+  return { meta: { functionality, environment, link, branch, tester, developer }, items };
 }

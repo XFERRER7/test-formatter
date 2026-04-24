@@ -37,6 +37,8 @@ interface ScriptEditorProps extends ScriptEditorHook {
     environment: string;
     link: string;
     branch: string;
+    tester: string;
+    developer: string;
     tests: TestItem[];
   }) => void;
 }
@@ -98,7 +100,7 @@ export function ScriptEditor({
             <Button
               variant="outline"
               className="cursor-pointer"
-              onClick={() => onInitExecution({ functionality, environment, link, branch, tests })}
+              onClick={() => onInitExecution({ functionality, environment, link, branch, tester, developer, tests })}
             >
               <Play className="h-4 w-4" />
               Executar

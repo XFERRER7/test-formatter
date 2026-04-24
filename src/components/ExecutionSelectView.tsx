@@ -22,6 +22,8 @@ interface ExecutionSelectViewProps {
     environment: string;
     link: string;
     branch: string;
+    tester: string;
+    developer: string;
     tests: TestItem[];
   }) => void;
 }
@@ -36,6 +38,8 @@ function parseScriptJson(text: string): ExecutionDraft | null {
       environment: String(parsed.environment ?? ""),
       link: String(parsed.link ?? ""),
       branch: String(parsed.branch ?? ""),
+      tester: String(parsed.tester ?? ""),
+      developer: String(parsed.developer ?? ""),
       tests: parsed.tests as TestItem[],
     };
   } catch {

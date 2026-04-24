@@ -142,6 +142,18 @@ export function ExecutionResultsView({
                   {executionScript.branch}
                 </span>
               )}
+              {executionScript.tester && (
+                <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <FileText className="h-3.5 w-3.5" />
+                  Tester: {executionScript.tester}
+                </span>
+              )}
+              {executionScript.developer && (
+                <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <FileText className="h-3.5 w-3.5" />
+                  Desenvolvedor: {executionScript.developer}
+                </span>
+              )}
             </div>
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
               <span>Iniciado em {report.executionStartedAt}</span>

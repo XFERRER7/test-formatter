@@ -17,6 +17,8 @@ export interface TestScript {
   environment: string;
   link: string;
   branch: string;
+  tester: string;
+  developer: string;
   tests: TestItem[];
   observations: string;
   createdAt: string;
@@ -39,6 +41,8 @@ export interface ExecutionMeta {
   environment: string;
   link: string;
   branch: string;
+  tester: string;
+  developer: string;
 }
 
 export interface ExecutionDraft {
@@ -46,6 +50,8 @@ export interface ExecutionDraft {
   environment: string;
   link: string;
   branch: string;
+  tester: string;
+  developer: string;
   tests: TestItem[];
 }
 

@@ -17,6 +17,8 @@ export function useScriptEditor() {
   const [environment, setEnvironment] = useState("");
   const [link, setLink] = useState("");
   const [branch, setBranch] = useState("");
+  const [tester, setTester] = useState("");
+  const [developer, setDeveloper] = useState("");
   const [tests, setTests] = useState<TestItem[]>(createInitialTests());
   const [observations, setObservations] = useState("Sem observações");
   const [copied, setCopied] = useState(false);
@@ -30,8 +32,8 @@ export function useScriptEditor() {
   }, []);
 
   const formatted = useMemo(
-    () => formatScript({ functionality, environment, link, branch, tests, observations }),
-    [functionality, environment, link, branch, observations, tests]
+    () => formatScript({ functionality, environment, link, branch, tester, developer, tests, observations }),
+    [functionality, environment, link, branch, tester, developer, observations, tests]
   );
 
   const handleCopy = useCallback(async () => {
@@ -41,11 +43,11 @@ export function useScriptEditor() {
   }, [formatted]);
 
   const handleCopyJson = useCallback(async () => {
-    const draft = { functionality, environment, link, branch, tests };
+    const draft = { functionality, environment, link, branch, tester, developer, tests };
     await navigator.clipboard.writeText(JSON.stringify(draft, null, 2));
     setJsonCopied(true);
     setTimeout(() => setJsonCopied(false), 1800);
-  }, [functionality, environment, link, branch, tests]);
+  }, [functionality, environment, link, branch, tester, developer, tests]);
 
   const addTest = (category: TestCategory) => {
     setTests((prev) => [...prev, createEmptyTest(category)]);
@@ -67,6 +69,8 @@ export function useScriptEditor() {
       environment,
       link,
       branch,
+      tester,
+      developer,
       tests,
       observations,
       createdAt: new Date().toLocaleString("pt-BR"),
@@ -83,6 +87,8 @@ export function useScriptEditor() {
     setEnvironment(script.environment);
     setLink(script.link ?? "");
     setBranch(script.branch ?? "");
+    setTester(script.tester ?? "");
+    setDeveloper(script.developer ?? "");
     setTests(script.tests);
     setObservations(script.observations);
     setShowSaved(false);
@@ -99,6 +105,8 @@ export function useScriptEditor() {
     setEnvironment("");
     setLink("");
     setBranch("");
+    setTester("");
+    setDeveloper("");
     setTests(createInitialTests());
     setObservations("Sem observações");
   };
@@ -108,13 +116,15 @@ export function useScriptEditor() {
   };
 
   // Expose current script snapshot for the execution flow
-  const currentScriptSnapshot = { functionality, environment, link, branch, tests };
+  const currentScriptSnapshot = { functionality, environment, link, branch, tester, developer, tests };
 
   return {
     functionality, setFunctionality,
     environment, setEnvironment,
     link, setLink,
     branch, setBranch,
+    tester, setTester,
+    developer, setDeveloper,
     tests,
     observations, setObservations,
     formatted,

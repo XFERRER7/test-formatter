@@ -18,6 +18,8 @@ export function useExecution() {
     environment: string;
     link: string;
     branch: string;
+    tester: string;
+    developer: string;
     tests: TestItem[];
   }) => {
     setExecutionScript({
@@ -25,6 +27,8 @@ export function useExecution() {
       environment: script.environment,
       link: script.link ?? "",
       branch: script.branch ?? "",
+      tester: script.tester ?? "",
+      developer: script.developer ?? "",
     });
     setExecutionItems(buildExecutionItems(script.tests));
     setExecutionStartedAt(new Date().toLocaleString("pt-BR"));

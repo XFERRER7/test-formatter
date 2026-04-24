@@ -46,6 +46,8 @@ export function ScriptEditor({
   environment, setEnvironment,
   link, setLink,
   branch, setBranch,
+  tester, setTester,
+  developer, setDeveloper,
   tests,
   observations, setObservations,
   formatted,
@@ -212,6 +214,24 @@ export function ScriptEditor({
                   value={branch}
                   onChange={(e) => setBranch(e.target.value)}
                   placeholder="Ex: feature/minha-branch"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tester">Tester</Label>
+                <Input
+                  id="tester"
+                  value={tester}
+                  onChange={(e) => setTester(e.target.value)}
+                  placeholder="Nome do tester responsável"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="developer">Desenvolvedor</Label>
+                <Input
+                  id="developer"
+                  value={developer}
+                  onChange={(e) => setDeveloper(e.target.value)}
+                  placeholder="Nome do desenvolvedor responsável"
                 />
               </div>
             </CardContent>

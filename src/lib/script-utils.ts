@@ -23,6 +23,8 @@ export function formatScript(script: {
   environment: string;
   link: string;
   branch: string;
+  tester: string;
+  developer: string;
   tests: TestItem[];
   observations: string;
 }): string {
@@ -32,6 +34,8 @@ export function formatScript(script: {
   lines.push(`Ambiente: ${script.environment}`);
   if (script.link) lines.push(`Link: ${script.link}`);
   if (script.branch) lines.push(`Branch: ${script.branch}`);
+  if (script.tester) lines.push(`Tester: ${script.tester}`);
+  if (script.developer) lines.push(`Desenvolvedor: ${script.developer}`);
   lines.push("");
   lines.push("📋 O que testar (Checklist):");
 

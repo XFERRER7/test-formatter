@@ -71,6 +71,12 @@ export function ExecutionBoard({
                 {executionScript.branch && (
                   <span>Branch: {executionScript.branch}</span>
                 )}
+                {executionScript.tester && (
+                  <span>Tester: {executionScript.tester}</span>
+                )}
+                {executionScript.developer && (
+                  <span>Desenvolvedor: {executionScript.developer}</span>
+                )}
               </CardDescription>
               {executionStartedAt && (
                 <p className="mt-1 text-xs text-muted-foreground">

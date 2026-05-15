@@ -74,6 +74,7 @@ export function buildExecutionItems(items: TestItem[]): ExecutionItem[] {
         isFixed: false,
         result: "pendente",
         notes: "",
+        ...(test.sourceScript ? { sourceScript: test.sourceScript } : {}),
       });
     }
   }

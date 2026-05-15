@@ -8,6 +8,8 @@ export interface TestItem {
   id: string;
   category: TestCategory;
   description: string;
+  /** Label do roteiro de origem (usado na validação de build) */
+  sourceScript?: string;
 }
 
 export interface TestScript {
@@ -35,6 +37,8 @@ export interface ExecutionItem {
   isFixed: boolean;
   result: TestResult;
   notes: string;
+  /** Label do roteiro de origem (usado na validação de build) */
+  sourceScript?: string;
 }
 
 export interface ExecutionMeta {

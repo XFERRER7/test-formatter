@@ -47,15 +47,16 @@ function mergeInputs(buildLabel: string, entries: InputEntry[]): ExecutionDraft 
   const branch = valid.map((e) => e.parsed!.branch).find(Boolean) || first.branch;
   const link = valid.map((e) => e.parsed!.link).find(Boolean) || first.link;
 
-  // Merge tests — deduplicate by trimmed lowercase description
+  // Merge tests — preserve order, deduplicate by trimmed lowercase description, tag source
   const seen = new Set<string>();
   const tests: TestItem[] = [];
-  for (const entry of valid) {
+  for (const [entryIdx, entry] of valid.entries()) {
+    const label = entry.parsed!.functionality?.trim() || `Roteiro ${entryIdx + 1}`;
     for (const t of entry.parsed!.tests) {
       const key = t.description.trim().toLowerCase();
       if (key && !seen.has(key)) {
         seen.add(key);
-        tests.push({ ...t, id: generateId() });
+        tests.push({ ...t, id: generateId(), sourceScript: label });
       }
     }
   }

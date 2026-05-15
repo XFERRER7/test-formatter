@@ -165,31 +165,88 @@ export function ExecutionBoard({
         </div>
       )}
 
-      {CATEGORIES.map((category) => {
-        const items = executionItems.filter(
-          (i) => !i.isFixed && i.category === category
-        );
-        if (items.length === 0) return null;
-        return (
-          <Card key={category}>
-            <CardHeader className="pb-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                {CATEGORY_LABELS[category]}
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {items.map((item) => (
-                <ExecutionItemCard
-                  key={item.id}
-                  item={item}
-                  onResultChange={finalized ? () => {} : updateResult}
-                  onNotesChange={finalized ? () => {} : updateNotes}
-                />
-              ))}
-            </CardContent>
-          </Card>
-        );
-      })}
+      {(() => {
+        const nonFixed = executionItems.filter((i) => !i.isFixed);
+        const hasSourceScripts = nonFixed.some((i) => i.sourceScript);
+
+        if (hasSourceScripts) {
+          // Build ordered list of unique source scripts preserving insertion order
+          const orderedScripts: string[] = [];
+          for (const item of nonFixed) {
+            if (item.sourceScript && !orderedScripts.includes(item.sourceScript)) {
+              orderedScripts.push(item.sourceScript);
+            }
+          }
+
+          return orderedScripts.map((script, scriptIdx) => {
+            const scriptItems = nonFixed.filter((i) => i.sourceScript === script);
+            return (
+              <div key={script} className="space-y-3">
+                {/* Script section divider */}
+                <div className="flex items-center gap-3 pt-1">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                    {scriptIdx + 1}
+                  </span>
+                  <span className="font-semibold text-sm text-foreground">{script}</span>
+                  <div className="flex-1 h-px bg-border" />
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    {scriptItems.length} {scriptItems.length === 1 ? "cenário" : "cenários"}
+                  </span>
+                </div>
+
+                {CATEGORIES.map((category) => {
+                  const items = scriptItems.filter((i) => i.category === category);
+                  if (items.length === 0) return null;
+                  return (
+                    <Card key={category} className="ml-2 border-l-2 border-l-primary/20">
+                      <CardHeader className="pb-3">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          {CATEGORY_LABELS[category]}
+                        </p>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {items.map((item) => (
+                          <ExecutionItemCard
+                            key={item.id}
+                            item={item}
+                            onResultChange={finalized ? () => {} : updateResult}
+                            onNotesChange={finalized ? () => {} : updateNotes}
+                          />
+                        ))}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            );
+          });
+        }
+
+        // Fallback: group by category (single script or no source info)
+        return CATEGORIES.map((category) => {
+          const items = nonFixed.filter((i) => i.category === category);
+          if (items.length === 0) return null;
+          return (
+            <Card key={category}>
+              <CardHeader className="pb-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {CATEGORY_LABELS[category]}
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {items.map((item) => (
+                  <ExecutionItemCard
+                    key={item.id}
+                    item={item}
+                    onResultChange={finalized ? () => {} : updateResult}
+                    onNotesChange={finalized ? () => {} : updateNotes}
+                  />
+                ))}
+              </CardContent>
+            </Card>
+          );
+        });
+      })()}
 
       {executionItems.some((i) => i.isFixed) && (
         <Card className="border-l-4 border-l-primary">
